@@ -8,10 +8,31 @@ import {
     Row,
     Table,
 } from "react-bootstrap";
+import axios from "axios";
 
 export default function List() {
     const [content, setContent] = React.useState("");
     const [list, setList] = React.useState([]);
+
+    React.useEffect(() => {
+        axios.get("http://127.0.0.1:8081").then((response) => {
+            const { data } = response;
+
+            const res = data.map((row, index) => {
+                return (
+                    <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{row.content}</td>
+                        <td>
+                            <Form.Check type="checkbox" value={row.ID} />
+                        </td>
+                    </tr>
+                );
+            });
+
+            setList(res);
+        });
+    }, []);
 
     const handleContent = (e) => {
         const { value } = e.target;
@@ -24,17 +45,27 @@ export default function List() {
 
         const { length } = list;
 
-        const item = (
-            <tr key={length}>
-                <td>{length}</td>
-                <td>{content}</td>
-                <td>
-                    <Form.Check type="checkbox" />
-                </td>
-            </tr>
-        );
+        axios({
+            method: "post",
+            url: "http://127.0.0.1:8081/create",
+            data: {
+                content: content,
+            },
+        }).then((response) => {
+            if (response.status === 201) {
+                const item = (
+                    <tr key={length + 1}>
+                        <td>{length + 1}</td>
+                        <td>{content}</td>
+                        <td>
+                            <Form.Check type="checkbox" />
+                        </td>
+                    </tr>
+                );
 
-        setList([...list, item]);
+                setList([...list, item]);
+            }
+        });
     };
 
     return (

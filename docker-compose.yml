@@ -1,8 +1,20 @@
 version: "3"
 services:
-  frontend:
-    build: ./frontend
-    volumes:
-      - ./frontend:/home/node/app
-    ports:
-      - "8080:5000"
+    database:
+        build: ./database
+        ports:
+            - "3306:3306"
+    backend:
+        build: ./backend
+        volumes:
+            - ./backend:/home/node/app
+        ports:
+            - "8081:3000"
+        environment:
+            - DBHOST=database
+    frontend:
+        build: ./frontend
+        volumes:
+            - ./frontend:/home/node/app
+        ports:
+            - "8080:5000"
